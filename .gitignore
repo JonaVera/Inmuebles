@@ -1,0 +1,98 @@
+# Ignorar archivos de sistema
+.DS_Store
+
+# Ignorar directorios y archivos de dependencias
+node_modules/
+__pycache__/
+
+# Ignorar archivos de presentación
+*.ppt
+# *.pptx
+*.pdf
+
+# Ignorar archivos comprimidos y videos
+*.zip
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# Ignorar audios
+*.mp3
+*.wav
+*.aac
+
+# Ignorar documentos de Word
+*.doc
+*.docx
+
+# Ignorar archivos de configuración específicos de IDEs y editores
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# Ignorar directorio de Git (para evitar casos raros)
+.git/
+
+# Ignorar otros archivos y directorios comunes
+*.log
+*.tmp
+*.bak
+*.swp
+
+# Ignorar archivos de caché
+*.cache
+*.tmp
+
+# Ignorar archivos de build
+/dist/
+/build/
+
+# Ignorar archivos de sistema de archivos
+*.DS_Store
+
+# Ignorar archivos de configuraciones específicas de Python
+*.env
+*.venv
+*.pyc
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+.eggs/
+*.cover
+*.cache
+*.pytest_cache/
+.tox/
+.coverage
+.coverage.*
+.cache
+.nox/
+*.coverage.*
+htmlcov/
+covhtml/
+
+# Ignorar archivos de configuración de servicios de CI
+.circleci/
+.github/
+.travis.yml
+.appveyor.yml
+
+# Ignorar archivos de configuración de Django
+db.sqlite3
+.env
+env/
+venv/
+
+# Ignorar archivos de migraciones de Django
+*/migrations/*
+!*/migrations/__init__.py
+
+# Ignorar archivos de reportes
+reports/
+*.report
+
+# Ignorar archivos de media (subidos por usuarios)
+media/
+

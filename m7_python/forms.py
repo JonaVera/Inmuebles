@@ -1,7 +1,7 @@
 # Formularios
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
-from .models import UserProfile, ContactForm, Inmueble
+from .models import UserProfile, ContactForm, Inmueble, Solicitud
 from django.contrib.auth.models import User
 
 # Todos estos datos tienen que coincidir con los models, 
@@ -54,16 +54,14 @@ class InmuebleForm(forms.ModelForm):
             'comuna'
         ]
 
-
 #TODO__ FORM SOLICITUDES 
-# class UpdateSolicitudEstadoForm(forms.ModelForm):
-#     class Meta:
-#         model = Solicitud
-#         fields = ['estado']
-#         widgets = {
-#             'estado': forms.Select(choices=Solicitud.ESTADOS)  # ChoiseField basado en el modelo
-#         } 
-
+class UpdateSolicitudEstadoForm(forms.ModelForm):
+    class Meta:
+        model = Solicitud
+        fields = ['estado']
+        widgets = {
+            'estado': forms.Select(choices=Solicitud.ESTADOS)  # ChoiseField basado en el modelo
+        } 
 
 #TODO__ FORM DISPONIBILIDAD  
 class EditDisponibilidadForm(forms.ModelForm):
@@ -74,12 +72,4 @@ class EditDisponibilidadForm(forms.ModelForm):
             'disponible': forms.CheckboxInput(),  # Input como checkbox (disponible o no)
         }
 
-
-#TODO__ FORM EJEMPLO 
-# class EjemploInmuebleForm(forms.ModelForm):
-#     class Meta: 
-#         model = Inmueble
-#         fields = [
-#             'nombre', 'descripcion'
-#         ]
 

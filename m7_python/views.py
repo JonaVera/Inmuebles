@@ -1,7 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .services import get_all_inmuebles, get_or_create_user_profile, get_inmuebles_for_arrendador, create_inmueble_for_arrendador, actualizar_disponibilidad_inmueble
+from .services import (get_all_inmuebles, get_or_create_user_profile, get_inmuebles_for_arrendador, 
+                       create_inmueble_for_arrendador, actualizar_disponibilidad_inmueble
+                       )
 from django.contrib.auth.decorators import login_required
-from .forms import CustomUserCreationForm, UserProfileForm, ContactModelForm, UserForm, UserEditProfileForm, InmuebleForm, EditDisponibilidadForm
+from .forms import (CustomUserCreationForm, UserProfileForm, ContactModelForm, UserForm, UserEditProfileForm, 
+                    InmuebleForm, EditDisponibilidadForm, UpdateSolicitudEstadoForm
+                    )
 from .models import UserProfile, ContactForm, Inmueble, Solicitud, User
 from django.contrib.auth import login
 from django.contrib import messages # type: ignore
@@ -33,9 +37,23 @@ def indexView(request):
     else:
         return redirect('login')
     
+#* FILTROS - SERVICES - SEARCH
+def buscar_por_nombre(request):
+    pass
+#! Estas van a ser funciones (services)
+#* x REGION y x COMUNA
+def filtros_combinados(inmuebles, region='todas', comuna='todas'):
+    if region != 'todas':
+        inmuebles = inmuebles.filter(comuna__region__nombre=region)
+    if comuna != 'todas':
+        inmuebles = inmuebles.filter(comuna__nombre=comuna)
+    return inmuebles   
+    
 @login_required   
 def index_arrendatario(request):
     inmuebles = get_all_inmuebles()
+    inmuebles = filtros_combinados(inmuebles, 'De Valparaíso', 'Valparaíso')
+    # inmuebles = filtros_combinados(inmuebles, 'De Valparaíso')
     return render(request,'arrendatario/index_arrendatario.html',{'inmuebles':inmuebles} )
 
 @login_required 
@@ -211,17 +229,27 @@ def view_list_user_solicitudes(request):
         'arrendatario': arrendatario
     })
 
+#* del ARRENDADOR
+@login_required
+def view_list_solicitudes(request, inmueble_id):
+    # Obtenemos inmueble para validar previamente
+    inmueble = get_object_or_404(Inmueble, id=inmueble_id) 
+    solicitudes = Solicitud.objects.filter(inmueble_id=inmueble_id)
+    return render(request, 'arrendador/list_solicitudes.html', {'inmueble':inmueble, 'solicitudes': solicitudes})
 
-# #* DAY 19 HITO 5 - MARTES
-
-# #* del ARRENDADOR
-# @login_required
-# def view_list_solicitudes(request, inmueble_id):
-#     pass 
-
-# @login_required
-# def edit_status_solicitud(request, solicitud_id):
-#     pass 
+@login_required
+def edit_status_solicitud(request, solicitud_id):
+    solicitud = get_object_or_404(Solicitud, id=solicitud_id) 
+    if request.method == 'POST':
+        form = UpdateSolicitudEstadoForm(request.POST, instance=solicitud)
+        if form.is_valid():
+            form.save()
+            print(f'--> {form.cleaned_data['estado']}')
+            return redirect('view_list_solicitudes', inmueble_id=solicitud.inmueble.id)
+    else:
+        form = UpdateSolicitudEstadoForm(instance=solicitud)
+    return render(request, 'arrendador/edit_status_solicitud.html', {'form': form, 'solicitud': solicitud})
+    
 
 # def cancelar_solicitud(request, solicitud_id):
 #     pass 

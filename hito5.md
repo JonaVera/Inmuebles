@@ -21,3 +21,18 @@
 - Creamos las carpetas filtros dentro de templates con 3 archivos html.
 - En views.py creamos Filtros - Services - Search,
 definimos (buscar_por_nombre). Estos estara conectado a los archivos de la carpeta filtros, modificamos el index_arrendatario en la views.py.
+
+-----------------------------------------------------------------------------------------------------
+# DAY 20
+## FILTROS
+
+
+- Inicializamos el Entorno
+--> source venv/Scripts/activate
+- Ejecutamos el servidor
+--> python manage.py runserver
+
+Para subir al github ya inicializado:
+- git add .
+- git commit -m "Hito5 views arrendador"
+- git push origin master

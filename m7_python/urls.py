@@ -2,7 +2,8 @@ from django.urls import path
 from .views import (indexView, register, register_rol, profile_view, about, contact, edit_profile_view,
                     index_arrendatario, dashboard_arrendador, not_authorized_view, create_inmueble,
                     edit_inmueble, detail_inmueble, delete_inmueble, edit_disponibilidad_inmueble,
-                    send_solicitud, view_list_user_solicitudes, view_list_solicitudes, edit_status_solicitud
+                    send_solicitud, view_list_user_solicitudes, view_list_solicitudes, edit_status_solicitud,
+                    cancelar_solicitud
                     )
 
 urlpatterns = [
@@ -13,7 +14,7 @@ urlpatterns = [
     path('accounts/register', register, name='register'),
     path('accounts/register_rol', register_rol, name='register_rol'),
     
-    path('profile', profile_view, name='profile'),
+    path('profile/', profile_view, name='profile'),
     path('profile/edit', edit_profile_view, name='edit_profile'),
     
     
@@ -25,7 +26,7 @@ urlpatterns = [
     path('index', index_arrendatario, name='index_arrendatario'),
     path('inmueble/solicitar/<int:inmueble_id>/', send_solicitud, name='send_solicitud'),
     path('list/solicitudes/', view_list_user_solicitudes, name='solicitudes'),
-
+     path('cancelar_solicitud/<int:solicitud_id>/', cancelar_solicitud, name='cancelar_solicitud'),
 
     # TODO__ PATH (urls - ROUTES) - ARRENDADOR
     path('dashboard', dashboard_arrendador, name="dashboard_arrendador"),

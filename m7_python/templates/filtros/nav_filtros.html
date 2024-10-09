@@ -4,7 +4,7 @@
             {% csrf_token %}
             <div class="col-md-4">
                 <label for="region" class="form-label">Región</label>
-                <select name="region" id="region" class="form-select" onchange="updateFilter(event, 'reg')">
+                <select name="region" id="region" class="form-select" onchange="updateFilter(event)">
 
                     {% if selected_region == 'todas' %}
                     <option value="todas" selected>
@@ -26,7 +26,7 @@
             </div>
             <div class="col-md-4">
                 <label for="comuna" class="form-label">Comuna</label>
-                <select name="comuna" id="comuna" class="form-select" onchange="updateFilter(event, 'com')">
+                <select name="comuna" id="comuna" class="form-select" onchange="updateFilter(event)">
                     {% if selected_comuna == 'todas' %}
                     <option value="todas" selected>
                     {% else %}
@@ -45,7 +45,6 @@
                     {% endfor %}
                 </select>
             </div>
-            <input type="hidden" name="pepe_value_touch_select" id="pepe_value_touch_select" value="">
         </form>
         <div class="col-md-4 d-flex align-items-start">
             {% block search %}

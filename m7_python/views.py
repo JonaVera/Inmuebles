@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import (CustomUserCreationForm, UserProfileForm, ContactModelForm, UserForm, UserEditProfileForm, 
                     InmuebleForm, EditDisponibilidadForm, UpdateSolicitudEstadoForm
                     )
-from .models import UserProfile, ContactForm, Inmueble, Solicitud, User
+from .models import UserProfile, ContactForm, Inmueble, Solicitud, User, Region, Comuna
 from django.contrib.auth import login
 from django.contrib import messages # type: ignore
 from .decorators import rol_requerido
@@ -38,8 +38,10 @@ def indexView(request):
         return redirect('login')
     
 #* FILTROS - SERVICES - SEARCH
-def buscar_por_nombre(request):
-    pass
+def buscar_por_nombre(search_value, inmuebles_list):
+    filtered_inmuebles = [inmueble for inmueble in inmuebles_list if search_value.lower() in inmueble.nombre.lower()]
+    print('in search')
+    return filtered_inmuebles
 #! Estas van a ser funciones (services)
 #* x REGION y x COMUNA
 def filtros_combinados(inmuebles, region='todas', comuna='todas'):
@@ -47,14 +49,45 @@ def filtros_combinados(inmuebles, region='todas', comuna='todas'):
         inmuebles = inmuebles.filter(comuna__region__nombre=region)
     if comuna != 'todas':
         inmuebles = inmuebles.filter(comuna__nombre=comuna)
-    return inmuebles   
-    
-@login_required   
+    return inmuebles 
+
+@login_required 
 def index_arrendatario(request):
     inmuebles = get_all_inmuebles()
-    inmuebles = filtros_combinados(inmuebles, 'De Valparaíso', 'Valparaíso')
+    
+    #* Manejo de si el Inmueble ha sido solicitado o no por el arrendatario
+    #* Agregamos al inmueble una nueva prop solicitudes_filtradas
+    user = request.user
+    for inmueble in inmuebles:
+        # Obtener las solicitudes del inmueble que pertenezcan al usuario actual
+        inmueble.solicitudes_filtradas = inmueble.solicitudes.filter(arrendatario=user,estado__in=['pendiente', 'aprobada'])
+    #*--------------------------------------------------------------------
+    
     # inmuebles = filtros_combinados(inmuebles, 'De Valparaíso')
-    return render(request,'arrendatario/index_arrendatario.html',{'inmuebles':inmuebles} )
+    # inmuebles = filtros_combinados(inmuebles, 'De Valparaíso')
+    comunas = Comuna.objects.all().order_by('nombre')
+    regiones = Region.objects.all().order_by('nombre')
+    
+    comuna = request.GET.get('comuna', 'todas')
+    region = request.GET.get('region', 'todas')
+    print(f'-comuna-> {comuna}')
+    print(f'-region-> {region}')
+    
+    
+    # if region == 'todas':
+    #     comuna = 'todas'
+        
+    inmuebles = filtros_combinados(inmuebles, region, comuna)
+    
+     #* SEARCH 
+    search_value = request.POST.get('search', '') if request.method == 'POST' else ''
+    print(f'search_value - {search_value}')
+    if search_value != '':
+        inmuebles = buscar_por_nombre(search_value, inmuebles)
+    
+    
+    return render(request,'arrendatario/index_arrendatario.html',{'inmuebles':inmuebles, 'comunas':comunas, 'selected_comuna': comuna, 'regiones':regiones, 'selected_region': region} )
+
 
 @login_required 
 def dashboard_arrendador(request):
@@ -251,21 +284,17 @@ def edit_status_solicitud(request, solicitud_id):
     return render(request, 'arrendador/edit_status_solicitud.html', {'form': form, 'solicitud': solicitud})
     
 
-# def cancelar_solicitud(request, solicitud_id):
-#     pass 
-
-
-# #* del ARRENDATARIO - VER que botón se le puede o debe anexar
-# #* DAY 20 HITO 5 - LUNES
-# def detail_inmueble_user(request, inmueble_id):
-#     pass 
-
-
-# #! Estas van a ser funciones (services)
-# #* x REGION y x COMUNA
-# def filtros(request):
-#     pass 
-
-# def buscar_por_nombre(request):
-#     pass
+@login_required
+@rol_requerido('arrendatario')
+def cancelar_solicitud(request, solicitud_id):
+    solicitud = get_object_or_404(Solicitud, id=solicitud_id)
+    inmueble = solicitud.inmueble
+    # Eliminar la solicitud solo si está en estado 'pendiente'
+    if solicitud.estado == 'pendiente':
+        solicitud.delete()
+        messages.success(request, f'Solicitud cancelada para el inmueble {inmueble.nombre}')
+        return redirect('solicitudes')
+    else:
+        # Puedes redirigir a una página de error o mostrar un mensaje si el estado no permite la eliminación
+        return redirect('solicitudes')
 
